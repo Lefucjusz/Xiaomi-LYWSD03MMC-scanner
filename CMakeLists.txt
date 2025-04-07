@@ -10,8 +10,12 @@ target_sources(app
 )
 
 add_subdirectory(src/scanner)
+add_subdirectory(src/xiaomi)
+add_subdirectory(src/connection)
 
 target_link_libraries(app
     PRIVATE
         scanner
+        xiaomi
+        connection
 )

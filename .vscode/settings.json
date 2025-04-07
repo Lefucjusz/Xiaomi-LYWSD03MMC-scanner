@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "*.cpp": "cpp",
+        "conn.h": "c",
+        "string_view": "c",
+        "scanner.h": "c",
+        "xiaomi.h": "c"
+    }
+}

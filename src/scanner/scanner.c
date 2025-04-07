@@ -1,6 +1,5 @@
 #include "scanner.h"
 #include <zephyr/logging/log.h>
-#include <zephyr/bluetooth/bluetooth.h>
 
 LOG_MODULE_REGISTER(scanner);
 
