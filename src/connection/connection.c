@@ -8,7 +8,7 @@ LOG_MODULE_REGISTER(connection);
 typedef struct
 {
     struct bt_conn *connection;
-    xiaomi_frame_callback_t frame_callback;
+    const connection_callbacks_t *callbacks;
 } connection_ctx_t;
 
 static connection_ctx_t ctx;
@@ -37,10 +37,14 @@ static void connected_callback(struct bt_conn *conn, uint8_t err)
         return;
     }
 
-    err = xiaomi_subscribe_to_data(ctx.connection, ctx.frame_callback);
+    err = xiaomi_subscribe_to_data(ctx.connection, ctx.callbacks->frame_received);
     if (err) {
         LOG_ERR("Failed to subscribe to data, error %d!", err);
         return;
+    }
+
+    if (ctx.callbacks->connection_established != NULL) {
+        ctx.callbacks->connection_established();
     }
 
     LOG_INF("Connected!");
@@ -54,6 +58,10 @@ static void disconnected_callback(struct bt_conn *conn, uint8_t reason)
     bt_conn_unref(ctx.connection);
     ctx.connection = NULL;
 
+    if (ctx.callbacks->connection_lost != NULL) {
+        ctx.callbacks->connection_lost();
+    }
+
     scanner_start(connection_device_found_callback);
 }
 
@@ -62,13 +70,13 @@ BT_CONN_CB_DEFINE(conn_callbacks) = {
     .disconnected = disconnected_callback
 };
 
-int connection_init(xiaomi_frame_callback_t callback)
+int connection_init(const connection_callbacks_t *callbacks)
 {
-    if (callback == NULL) {
+    if (callbacks == NULL) {
         return -EINVAL;
     }
 
-    ctx.frame_callback = callback;
+    ctx.callbacks = callbacks;
 
     return 0;
 }
